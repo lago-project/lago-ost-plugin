@@ -126,22 +126,8 @@ run_installation_tests() {
 }
 
 
-run_basic_functional_tests() {
-    local res
-    # Avoid any heavy tests (for example, any that download templates)
-    bats \
-        tests/functional/*basic.bats \
-        tests/functional/status.bats \
-        tests/functional/start.bats \
-        tests/functional/collect.bats \
-        tests/functional/deploy.bats \
-    | tee exported-artifacts/functional_tests.tap
-    res=${PIPESTATUS[0]}
-    return $res
-}
 
-
-run_full_functional_tests() {
+run_functional_tests() {
     local res
     # Allow notty sudo, for the tests on jenkinslike environment
     [[ -e /etc/sudoers ]] \

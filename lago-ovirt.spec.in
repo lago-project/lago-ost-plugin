@@ -46,7 +46,6 @@ Requires: repoman >= 2.0.12
 Requires: yum-utils
 Requires: rpm-build
 Requires: xz
-#%{?python_provide:%python_provide python2-lago-ovirt}
 %{?python_provide:%python_provide python2-%{name}}
 
 %description -n python-%{name}
