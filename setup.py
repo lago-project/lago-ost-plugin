@@ -29,8 +29,9 @@ def get_version(project_dir=os.curdir):
     Raises:
         RuntimeError: If the version could not be retrieved
     """
-    if 'LAGO_VERSION' in os.environ and os.environ['LAGO_VERSION']:
-        return os.environ['LAGO_VERSION']
+
+    if 'OVIRTLAGO_VERSION' in os.environ and os.environ['OVIRTLAGO_VERSION']:
+        return os.environ['OVIRTLAGO_VERSION']
 
     version = None
     pkg_info_file = os.path.join(project_dir, 'PKG-INFO')

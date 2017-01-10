@@ -1,1 +1,2 @@
 ovirt-ci-tools,http://resources.ovirt.org/repos/ci-tools/$distro
+lago,http://resources.ovirt.org/repos/lago/stable/0.0/rpm/$distro

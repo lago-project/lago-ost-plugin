@@ -94,7 +94,7 @@ run_installation_tests() {
     fi
     # fail if a glob turns out empty
     shopt -s failglob
-    for package in {python-,}lago {python-,}lago-ovirt; do
+    for package in {python-,}lago-ovirt; do
         echo "    $package: installing"
         ## Install one by one to make sure the deps are ok
         $yum install -y exported-artifacts/"$package"-[[:digit:]]*.noarch.rpm \

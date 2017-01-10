@@ -1,5 +1,5 @@
 VERSION=$(shell scripts/version_manager.py . version)
-NAME=lago
+NAME=lago-ovirt
 TAR_FILE=${NAME}-${VERSION}.tar
 TARBALL_FILE=${TAR_FILE}.gz
 SPECFILE=${NAME}.spec
@@ -46,7 +46,7 @@ ${SPECFILE}: ${SPECFILE}.in changelog
 	cat ChangeLog >> $@
 
 build:
-	LAGO_VERSION=${VERSION} python setup.py build
+	OVIRTLAGO_VERSION=${VERSION} python setup.py build
 
 check: check-local
 
@@ -64,14 +64,14 @@ check-local:
 	@echo "-------------------------------------------------------------"
 	@echo "-~      Running unit tests                                 --"
 	@echo "-------------------------------------------------------------"
-	PYTHONPATH=${PWD} python ${PYTEST} -v tests/unit
+	PYTHONPATH=${PWD} python ${PYTEST} -v tests/unit/*
 	@echo "-------------------------------------------------------------"
 	@echo "-------------------------------------------------------------"
 
 dist: ${TARBALL_DIST_LOCATION}
 
 python-sdist:
-	LAGO_VERSION=${VERSION} python setup.py sdist --dist-dir ${DIST_DIR}
+	OVIRTLAGO_VERSION=${VERSION} python setup.py sdist --dist-dir ${DIST_DIR}
 
 add-extra-files-sdist: changelog fullchangelog
 	gunzip ${TARBALL_DIST_LOCATION}

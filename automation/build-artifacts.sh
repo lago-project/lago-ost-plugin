@@ -13,8 +13,8 @@ mkdir -p "$BUILDS"
 mkdir -p "$EXPORTS"
 
 make clean
-make lago.spec
-$YUM -y lago.spec
+make lago-ovirt.spec
+$YUM -y lago-ovirt.spec
 make rpm OUTPUT_DIR="$BUILDS"
 
 find "$BUILDS" \
