@@ -55,7 +55,7 @@ autodoc_mock_imports = [
     'ovirtsdk.infrastructure.errors.RequestError', 'paramiko', 'rpmUtils',
     'rpmUtils.arch', 'rpmUtils.miscutils', 'scp', 'stevedore',
     'stevedore.extension', 'yaml', 'xmltodict', 'dulwich', 'configparser',
-    'lago'
+    'lago', 'lago.prefix'
 ]
 
 autodoc_default_flags = [
