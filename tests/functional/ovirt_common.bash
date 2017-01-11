@@ -1,6 +1,5 @@
 #!/bin/bash
 OVIRT_VERBS=(
-    collect
     deploy
     engine-setup
     reposetup
