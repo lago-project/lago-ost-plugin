@@ -1,19 +1,10 @@
+lago
 bats
 git
-lago
 python-dulwich
 python2-devel
 python-virtualenv
-#not provided by pip
-python-libguestfs
-libxslt-devel
-libvirt-devel
-libffi-devel
-openssl-devel
 yum
-# needed for fc23
-# see http://pkgs.fedoraproject.org/cgit/libguestfs.git/tree/libguestfs.spec#n131
-grubby
 python-pip
 
 # needed for ovirtsdk
