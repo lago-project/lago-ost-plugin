@@ -10,6 +10,7 @@ Source0: https://resources.ovirt.org/repos/lago/0.0/src/%{name}/%{name}-%{versio
 BuildRequires: python2-devel
 Requires: lago >= 0.30
 Requires: python-%{name} = %{version}
+Provides: lago-ost-plugin
 
 %description
 A Lago plugin to create an oVirt testing environment
@@ -47,6 +48,7 @@ Requires: yum-utils
 Requires: rpm-build
 Requires: xz
 %{?python_provide:%python_provide python2-%{name}}
+%{?python_provide:%python_provide python2-lago-ost-plugin}
 
 %description -n python-%{name}
 
