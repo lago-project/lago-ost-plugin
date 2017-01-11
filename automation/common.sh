@@ -43,8 +43,8 @@ build_docs() {
     chown -R $USER .cache
     virtualenv -q tests/docs_venv || return 1
     source tests/docs_venv/bin/activate
-    pip --quiet install --upgrade pip || return 1
-    pip --quiet install --requirement docs/requires.txt || return 1
+    pip install --upgrade pip || return 1
+    pip install --requirement docs/requires.txt || return 1
     make docs || res=$?
     deactivate
     mv docs/_build "$docs_dir"

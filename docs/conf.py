@@ -25,19 +25,7 @@ import setup as lago_ost_setup  # flake8: noqa
 subprocess.call(
     [
         'sphinx-apidoc', '--module-first', '--no-toc', '-f', '-o',
-        os.path.dirname(__file__), '../lago'
-    ]
-)
-subprocess.call(
-    [
-        'sphinx-apidoc', '--module-first', '--no-toc', '-f', '-o',
         os.path.dirname(__file__), '../ovirtlago'
-    ]
-)
-subprocess.call(
-    [
-        'sphinx-apidoc', '--module-first', '--no-toc', '-f', '-o',
-        os.path.dirname(__file__), '../lago_template_repo'
     ]
 )
 subprocess.call([
@@ -50,12 +38,8 @@ shutil.move('../ChangeLog', '_static/ChangeLog.txt')
 # Mock all the modules that are included by lago, so autoimport works as
 # expected with no need to download them (some are not in pip even)
 autodoc_mock_imports = [
-    'lockfile', 'lxml', 'lxml.etree', 'magic', 'ovirtsdk', 'ovirtsdk.api',
-    'ovirtsdk.infrastructure', 'ovirtsdk.infrastructure.errors',
-    'ovirtsdk.infrastructure.errors.RequestError', 'paramiko', 'rpmUtils',
-    'rpmUtils.arch', 'rpmUtils.miscutils', 'scp', 'stevedore',
-    'stevedore.extension', 'yaml', 'xmltodict', 'dulwich', 'configparser',
-    'lago', 'lago.prefix'
+    'lago', 'lago.log_utils', 'lago.plugins', 'lago.prefix', 'lago.utils',
+    'lago.vm', 'lago.paths', 'lago.workdir'
 ]
 
 autodoc_default_flags = [
@@ -318,7 +302,12 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, 'lago', u'Lago Documentation', [author], 1)]
+man_pages = [
+    (
+        master_doc, 'lago-ost-plugin',
+        u'Lago ovirt-system-tests plugin Documentation', [author], 1
+    )
+]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False

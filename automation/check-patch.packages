@@ -15,3 +15,6 @@ yum
 # see http://pkgs.fedoraproject.org/cgit/libguestfs.git/tree/libguestfs.spec#n131
 grubby
 python-pip
+
+# needed for ovirtsdk
+libcurl-devel

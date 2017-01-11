@@ -1,3 +1,4 @@
+setuptools
 futures
 pytest
 nose
@@ -5,3 +6,4 @@ configparser
 yapf==0.14.0
 flake8
 dulwich
+ovirt-engine-sdk-python==3.6.9.2
