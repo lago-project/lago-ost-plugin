@@ -1,5 +1,5 @@
 VERSION=$(shell scripts/version_manager.py . version)
-NAME=lago
+NAME=lago-ovirt
 TAR_FILE=${NAME}-${VERSION}.tar
 TARBALL_FILE=${TAR_FILE}.gz
 SPECFILE=${NAME}.spec
@@ -44,7 +44,7 @@ ${SPECFILE}: ${SPECFILE}.in changelog
 	cat ChangeLog >> $@
 
 build:
-	LAGO_VERSION=${VERSION} python2 setup.py build
+	OVIRTLAGO_VERSION=${VERSION} python setup.py build
 
 check: check-local
 

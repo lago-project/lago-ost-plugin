@@ -1,11 +1,3 @@
-lxml
-lockfile
-paramiko
-xmltodict
-scp
-setuptools
-stevedore
-PyYAML
-enum
-pyxdg
 configparser
+nose
+setuptools

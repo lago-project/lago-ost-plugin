@@ -3,13 +3,9 @@ dnf
 dnf-command(builddep)
 git
 grubby
-libffi-devel
-libvirt-devel
-libxslt-devel
-openssl-devel
+lago
 python2-devel
 python2-dulwich
-python2-libguestfs
-python2-virtualenv
 python2-tox
+python2-virtualenv
 python-pip

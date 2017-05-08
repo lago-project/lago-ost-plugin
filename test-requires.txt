@@ -1,22 +1,10 @@
-# not provided by pip
-#python-libguestfs
-enum
-dulwich
-flake8
-libvirt-python
-lockfile
-lxml
-mock
-paramiko
 pytest
-python-magic
-pyyaml
-scp
-stevedore
-xmltodict
+nose
 configparser
-pyxdg
+setuptools
 futures
-xmlunittest
 yapf
 pytest-cov
+flake8
+dulwich
+enum

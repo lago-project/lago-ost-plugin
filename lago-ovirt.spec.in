@@ -1,0 +1,87 @@
+Version: @@VERSION@@
+Release: 1%{?dist}
+Name: lago-ovirt
+Summary: Lago ovirt-system-tests plugin
+BuildArch: noarch
+Group: System Environment/Libraries
+License: GPLv2+
+URL: https://github.com/lago-project/lago-ost-plugin
+Source0: https://resources.ovirt.org/repos/lago/0.0/src/%{name}/%{name}-%{version}.tar.gz
+BuildRequires: python2-devel
+Requires: lago >= 0.38
+Requires: python-%{name} = %{version}
+Provides: lago-ost-plugin
+
+%description
+A Lago plugin to create an oVirt testing environment
+
+
+%prep
+%setup -q -n %{name}-%{version}
+
+%build
+OVIRTLAGO_VERSION=%{version} %{py2_build}
+
+%install
+OVIRTLAGO_VERSION=%{version} %{py2_install}
+
+install -d %{buildroot}/var/lib/lago/reposync
+install -d -m 755 %{buildroot}%{_sysconfdir}/firewalld/services
+install -p -D -m 644 etc/firewalld/services/* %{buildroot}%{_sysconfdir}/firewalld/services/
+
+
+%files -n %{name}
+
+###################### python-lago-ovirt package
+%package -n python-%{name}
+Summary: Library for ovirt specific facitilies
+BuildArch: noarch
+BuildRequires: python2-devel
+Requires: python
+Requires: python-lago >= 0.38
+Requires: python-magic
+Requires: python-nose
+Requires: ovirt-engine-sdk-python >= 3.6.9.1-1
+Requires: createrepo
+Requires: repoman >= 2.0.12
+Requires: yum-utils
+Requires: rpm-build
+Requires: xz
+%{?python_provide:%python_provide python2-%{name}}
+%{?python_provide:%python_provide python2-lago-ost-plugin}
+
+%description -n python-%{name}
+
+%files -n python-%{name}
+%{python2_sitelib}/ovirtlago/*.py*
+%{python2_sitelib}/ovirtlago/data/*.yaml
+%{python2_sitelib}/lago_ovirt-%{version}-py*.egg-info
+
+%config(noreplace) %{_sysconfdir}/firewalld/services/*
+%dir %attr(2775, root, lago) /var/lib/lago/reposync/
+
+%post -n python-%{name}
+if which firewall-cmd &>/dev/null; then
+    # don't touch if ovirtlago service is already enabled
+    if ! firewall-cmd --query-service=ovirtlago --zone=public &>/dev/null; then
+        firewall-cmd --reload &> /dev/null
+        firewall-cmd --permanent --zone=public --add-service=ovirtlago &> /dev/null
+        firewall-cmd --reload &> /dev/null
+    fi
+fi
+
+
+%preun  -n python-%{name}
+if [[ "$1" == "0" ]]; then
+    # "0" indicates uninstallation
+    # "1" indicates upgrade - and then we do nothing
+    if which firewall-cmd &>/dev/null; then
+        if firewall-cmd --query-service=ovirtlago --zone=public &>/dev/null; then
+            firewall-cmd --permanent --zone=public --remove-service=ovirtlago &> /dev/null
+            firewall-cmd --reload &> /dev/null
+        fi
+    fi
+fi
+
+%changelog
+

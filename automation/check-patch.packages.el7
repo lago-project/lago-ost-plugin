@@ -1,14 +1,10 @@
 bats
 git
-libffi-devel
-libvirt-devel
-libxslt-devel
-openssl-devel
+lago
 python2-devel
 python-dulwich
-python-libguestfs
 python-pip
-python-virtualenv
 python-tox
+python-virtualenv
 yum
 yum-utils

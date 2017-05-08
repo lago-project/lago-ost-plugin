@@ -5,7 +5,6 @@ readonly OUT_DOCS_DIR="$EXPORTED_DIR/docs"
 
 source "${0%/*}/common.sh"
 
-
 [[ -d "$EXPORTED_DIR" ]] || mkdir -p "$EXPORTED_DIR"
 
 res=0
@@ -13,7 +12,7 @@ res=0
 echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 echo '~*          Building docs                              ~'
 echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-build_docs && mv -v docs/_build "$OUT_DOCS_DIR"/
+#build_docs && mv -v docs/_build "$OUT_DOCS_DIR"/
 
 echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 echo '~*          Running static/unit tests                  ~'
@@ -22,7 +21,7 @@ if code_changed; then
     run_unit_tests \
     || res=$?
     find "$PWD" \
-        \( -iname "lago.junit.xml" \
+        \( -iname "ovirtlago.junit.xml" \
         -o \
         -iname "coverage.xml" \
         -o \

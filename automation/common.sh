@@ -51,7 +51,6 @@ run_unit_tests() {
 
 run_installation_tests() {
     local yum
-    local package
     local res=0
     automation/build-artifacts.sh \
     || return $?
@@ -61,36 +60,10 @@ run_installation_tests() {
     else
         yum=yum
     fi
-    # fail if a glob turns out empty
-    shopt -s failglob
-    for package in {python-,}lago {python-,}lago-ovirt; do
-        echo "    $package: installing"
-        ## Install one by one to make sure the deps are ok
-        $yum install -y exported-artifacts/"$package"-[[:digit:]]*.noarch.rpm \
-        && echo "    $package: OK" \
-        || {
-            echo "    $package: FAILED"
-            return 1
-        }
-        if [[ "$package" == "lago" ]]; then
-            echo "    Checking that lago imports are not missing"
-            lago -h > /dev/null \
-            && echo "    OK" \
-            || {
-                echo "    FAILED"
-                return 1
-            }
-
-        elif [[ "$package" == "lago-ovirt" ]]; then
-            echo "    Checking that lago ovirt imports are not missing"
-            lago ovirt -h > /dev/null \
-            && echo "    OK" \
-            || {
-                echo "    FAILED"
-                return 1
-            }
-        fi
-    done
+    echo "Installing python-lago-ovirt"
+    $yum install -y exported-artifacts/python-lago-ovirt-*.noarch.rpm
+    echo "Imports sanity check"
+    lago ovirt -h
     return $res
 }
 
@@ -98,30 +71,19 @@ run_installation_tests() {
 run_basic_functional_tests() {
     local res
     # Avoid any heavy tests (for example, any that download templates)
+    [[ -e /etc/sudoers ]] \
+    && sed -i -e 's/^Defaults\s*requiretty/Defaults !requiretty/' /etc/sudoers
 
     sg lago -c "bats \
-        tests/functional/*basic.bats \
-        tests/functional/status.bats \
-        tests/functional/start.bats \
-        tests/functional/collect.bats \
-        tests/functional/deploy.bats \
-        tests/functional/export.bats" \
+        tests/functional/*.bats" \
     | tee exported-artifacts/functional_tests.tap
     res=${PIPESTATUS[0]}
-    return $res
+    return "$res"
 }
 
 
 run_full_functional_tests() {
-    local res
-    # Allow notty sudo, for the tests on jenkinslike environment
-    [[ -e /etc/sudoers ]] \
-    && sed -i -e 's/^Defaults\s*requiretty/Defaults !requiretty/' /etc/sudoers
-
-    sg lago -c 'bats tests/functional/*.bats' \
-    | tee exported-artifacts/functional_tests.tap
-    res=${PIPESTATUS[0]}
-    return $res
+    run_basic_functional_tests
 }
 
 

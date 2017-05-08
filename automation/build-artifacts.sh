@@ -1,6 +1,7 @@
 #!/bin/bash -ex
-BUILDS=$PWD/automation-build
-EXPORTS=$PWD/exported-artifacts
+readonly BUILDS=$PWD/automation-build
+readonly EXPORTS=$PWD/exported-artifacts
+readonly SPEC="lago-ovirt.spec"
 
 if hash dnf &>/dev/null; then
     YUM="dnf"
@@ -18,10 +19,10 @@ mkdir -p "$BUILDS"
 mkdir -p "$EXPORTS"
 
 make clean
-make lago.spec
+make "$SPEC"
 
 echo "installing RPM build dependencies"
-$BUILDDEP -y lago.spec
+$BUILDDEP -y "$SPEC"
 
 echo "creating RPM"
 make rpm OUTPUT_DIR="$BUILDS"
