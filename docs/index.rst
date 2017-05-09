@@ -1,17 +1,23 @@
-.. lago-ost-plugin documentation master file, created by
-   sphinx-quickstart on Tue May  9 19:36:02 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to lago-ost-plugin's documentation!
 ===========================================
 
-Contents:
+What is it
+-----------
+A `Lago`_ plugin which allows you to deploy and test `oVirt`_
+environments easily. It is mainly used by the `oVirt System tests`_
+framework.
 
-.. toctree::
-   :maxdepth: 2
+.. _Lago : http://lago.readthedocs.io
+.. _oVirt : http://www.ovirt.org
+.. _oVirt System tests : http://ovirt-system-tests.readthedocs.io
 
 
+
+Changelog
+------------
+Here you can find the `full changelog for this version`_
+
+.. _full changelog for this version: _static/ChangeLog.txt
 
 Indices and tables
 ==================
@@ -19,4 +25,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
