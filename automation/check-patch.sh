@@ -12,7 +12,7 @@ res=0
 echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 echo '~*          Building docs                              ~'
 echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-#build_docs && mv -v docs/_build "$OUT_DOCS_DIR"/
+build_docs && mv -v docs/_build "$OUT_DOCS_DIR"/
 
 echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 echo '~*          Running static/unit tests                  ~'
