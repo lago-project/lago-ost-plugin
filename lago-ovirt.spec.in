@@ -8,7 +8,7 @@ License: GPLv2+
 URL: https://github.com/lago-project/lago-ost-plugin
 Source0: https://resources.ovirt.org/repos/lago/0.0/src/%{name}/%{name}-%{version}.tar.gz
 BuildRequires: python2-devel
-Requires: lago >= 0.38
+Requires: lago >= 0.39
 Requires: python-%{name} = %{version}
 Provides: lago-ost-plugin
 
@@ -38,7 +38,7 @@ Summary: Library for ovirt specific facitilies
 BuildArch: noarch
 BuildRequires: python2-devel
 Requires: python
-Requires: python-lago >= 0.38
+Requires: python-lago >= 0.39
 Requires: python-magic
 Requires: python-nose
 Requires: ovirt-engine-sdk-python >= 3.6.9.1-1

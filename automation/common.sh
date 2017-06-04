@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 #
 # Common functions for the scripts
 #
@@ -60,10 +60,13 @@ run_installation_tests() {
     else
         yum=yum
     fi
+    echo "Install Lago from RPM"
+    $yum install -y lago || return $?
     echo "Installing python-lago-ovirt"
-    $yum install -y exported-artifacts/python-lago-ovirt-*.noarch.rpm
+    $yum install -y exported-artifacts/python-lago-ovirt-*.noarch.rpm || \
+        return $?
     echo "Imports sanity check"
-    lago ovirt -h
+    lago ovirt -h || res=$?
     return $res
 }
 

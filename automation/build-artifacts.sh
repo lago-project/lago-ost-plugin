@@ -13,6 +13,9 @@ fi
 echo "cleaning $YUM metadata"
 $YUM clean metadata
 
+echo "Installing Lago"
+$YUM install -y lago
+
 echo "cleaning $BUILDS, $EXPORTS"
 rm -rf "$BUILDS" "$EXPORTS"/*{.rpm,.tar.gz}
 mkdir -p "$BUILDS"

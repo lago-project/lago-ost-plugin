@@ -3,7 +3,6 @@ dnf
 dnf-command(builddep)
 git
 grubby
-lago
 python2-devel
 python2-dulwich
 python2-tox
