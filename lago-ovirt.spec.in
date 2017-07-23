@@ -61,12 +61,12 @@ Requires: xz
 %dir %attr(2775, root, lago) /var/lib/lago/reposync/
 
 %post -n python-%{name}
-if which firewall-cmd &>/dev/null; then
+if firewall-cmd --state &>/dev/null; then
     # don't touch if ovirtlago service is already enabled
-    if ! firewall-cmd --query-service=ovirtlago --zone=public &>/dev/null; then
-        firewall-cmd --reload &> /dev/null
-        firewall-cmd --permanent --zone=public --add-service=ovirtlago &> /dev/null
-        firewall-cmd --reload &> /dev/null
+    if ! firewall-cmd --query-service=ovirtlago --zone=public -q; then
+        firewall-cmd --reload -q
+        firewall-cmd --permanent --zone=public --add-service=ovirtlago -q
+        firewall-cmd --reload -q
     fi
 fi
 
@@ -75,13 +75,12 @@ fi
 if [[ "$1" == "0" ]]; then
     # "0" indicates uninstallation
     # "1" indicates upgrade - and then we do nothing
-    if which firewall-cmd &>/dev/null; then
-        if firewall-cmd --query-service=ovirtlago --zone=public &>/dev/null; then
-            firewall-cmd --permanent --zone=public --remove-service=ovirtlago &> /dev/null
-            firewall-cmd --reload &> /dev/null
+    if firewall-cmd --state &>/dev/null; then
+        if firewall-cmd --query-service=ovirtlago --zone=public -q; then
+            firewall-cmd --permanent --zone=public --remove-service=ovirtlago -q
+            firewall-cmd --reload -q
         fi
     fi
 fi
 
 %changelog
-
