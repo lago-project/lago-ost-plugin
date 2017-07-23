@@ -5,6 +5,4 @@ git
 grubby
 python2-devel
 python2-dulwich
-python2-tox
-python2-virtualenv
 python-pip
