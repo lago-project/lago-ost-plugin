@@ -120,7 +120,8 @@ def get_data_file(basename):
     )
 
 
-def available_sdks(modules=sys.modules):
+def available_sdks(modules=None):
+    modules = modules or sys.modules
     res = []
     if 'ovirtsdk' in modules:
         res.append('3')
@@ -129,7 +130,9 @@ def available_sdks(modules=sys.modules):
     return res
 
 
-def require_sdk(version, modules=sys.modules):
+def require_sdk(version, modules=None):
+    modules = modules or sys.modules
+
     def wrap(func):
         @functools.wraps(func)
         def wrapped_func(*args, **kwargs):
