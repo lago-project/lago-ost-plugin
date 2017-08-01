@@ -53,10 +53,7 @@ shutil.move('../ChangeLog', '_static/ChangeLog.txt')
 
 # Mock all the modules that are included by lago, so autoimport works as
 # expected with no need to download them (some are not in pip even)
-autodoc_mock_imports = [
-    'lago',
-    'ovirtsdk',
-]
+autodoc_mock_imports = ['lago', 'ovirtsdk', 'yaml', 'configparser']
 
 extensions = [
     'sphinx.ext.autodoc',
