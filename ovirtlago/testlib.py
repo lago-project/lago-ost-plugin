@@ -228,7 +228,7 @@ def assert_equals_within(func, value, timeout, allowed_exceptions=None, initial_
             if initial_wait == 0:
                 time.sleep(3)
             else:
-                sleep(initial_wait)
+                time.sleep(initial_wait)
                 initial_wait = 0
     try:
         raise AssertionError(
