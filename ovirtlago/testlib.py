@@ -209,7 +209,9 @@ def _instance_of_any(obj, cls_list):
     return any(True for cls in cls_list if isinstance(obj, cls))
 
 
-def assert_equals_within(func, value, timeout, allowed_exceptions=None, initial_wait=10):
+def assert_equals_within(
+    func, value, timeout, allowed_exceptions=None, initial_wait=10
+):
     allowed_exceptions = allowed_exceptions or []
     with utils.EggTimer(timeout) as timer:
         while not timer.elapsed():
