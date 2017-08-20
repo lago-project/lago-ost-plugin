@@ -153,6 +153,42 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
             )
         return cpu_map[host.cpu_vendor][host.cpu_model]
 
+    @require_sdk(version='4')
+    def update_clusters_cpu(self, timeout=2 * 60):
+        cpu_family = self.get_ovirt_cpu_family()
+        api = self.engine_vm().get_api_v4(check=True)
+        clusters_service = api.system_service().clusters_service()
+        clusters = clusters_service.list()
+
+        if clusters is None:
+            LOGGER.debug('no clusters found: skipping')
+            return
+
+        for cluster in clusters:
+            if cluster.cpu.type == cpu_family:
+                continue
+            LOGGER.debug(
+                ('found CPU cluster mismatch, current: {0}, required: '
+                 '{1}').format(cluster.cpu.type, cpu_family)
+            )
+
+            cluster_service = clusters_service.cluster_service(cluster.id)
+            cluster_service.update(
+                otypes.Cluster(cpu=otypes.Cpu(type=cpu_family))
+            )
+
+            def _assert_cluster_cpu(cluster):
+                cluster = clusters_service.cluster_service(cluster.id).get()
+                return cluster.cpu.type == cpu_family
+
+            testlib.assert_true_within(
+                partial(_assert_cluster_cpu, cluster), timeout=timeout
+            )
+            LOGGER.debug(
+                ('successfuly changed cluster id {0} to cpu family: '
+                 '{1}').format(cluster.id, cpu_family)
+            )
+
     def assert_vdsm_alive(self, timeout=2 * 60):
         """
         Assert service 'vdsmd' reports running on all vdsm hosts

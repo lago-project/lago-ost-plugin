@@ -250,6 +250,8 @@ def do_ovirt_start(prefix, with_vms, vms_timeout, **kwargs):
             prefix.virt_env.assert_engine_alive(timeout=3 * 60)
         with LogTask('Waiting for vdsmd status'):
             prefix.virt_env.assert_vdsm_alive(timeout=3 * 60)
+        with LogTask('Updating Clusters CPU'):
+            prefix.virt_env.update_clusters_cpu()
         with LogTask('Activating Engine Hosts'):
             prefix.virt_env.engine_vm().start_all_hosts(timeout=5 * 60)
         if with_vms:
