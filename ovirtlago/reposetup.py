@@ -24,6 +24,7 @@ import itertools
 import shutil
 import logging
 import os
+import tempfile
 
 from lago import log_utils
 from lago.utils import (
@@ -173,48 +174,66 @@ def sync_rpm_repository(repo_path, yum_config, repos):
     if not os.path.exists(repo_path):
         os.makedirs(repo_path)
 
+    # Avoid cache issues due to repo injection to reposync-config.repo
+    tmp_dir = tempfile.mkdtemp(prefix='reposync_')
+    tmp_cache_dir = os.path.join(tmp_dir, 'cache')
+    os.mkdir(tmp_cache_dir)
+
+    LOGGER.debug('Using {} as cache dir for reposync'.format(tmp_cache_dir))
+
     reposync_base_cmd = [
-        'reposync', '--config=%s' % yum_config,
-        '--download_path=%s' % repo_path, '--newest-only', '--delete',
-        '--cachedir=%s/cache' % repo_path
+        'reposync', '--config', yum_config, '--download_path', repo_path,
+        '--newest-only', '--delete', '--cachedir', tmp_cache_dir
     ]
     with LogTask('Running reposync'):
-        for repo in repos:
-            with LockFile(lock_path, timeout=180):
-                reposync_cmd = reposync_base_cmd + ['--repoid=%s' % repo]
-                ret, out, _ = run_command(reposync_cmd)
-                if not ret:
-                    LOGGER.debug('reposync on repo %s: success.' % repo)
-                    continue
+        try:
+            for repo in repos:
+                with LockFile(lock_path, timeout=180):
+                    reposync_cmd = reposync_base_cmd + ['--repoid', repo]
+                    ret, out, _ = run_command(reposync_cmd)
+                    if not ret:
+                        LOGGER.debug(
+                            'reposync on repo {}: success.'.format(repo)
+                        )
+                        continue
 
-                LOGGER.info('repo: %s: failed, re-running.', repo)
-                _fix_reposync_issues(
-                    reposync_out=out, repo_path=os.path.join(repo_path, repo)
-                )
-                ret, _, _ = run_command(reposync_cmd)
-                if not ret:
-                    continue
+                    LOGGER.info('repo: {}: failed, re-running.'.format(repo))
+                    _fix_reposync_issues(
+                        reposync_out=out,
+                        repo_path=os.path.join(repo_path, repo)
+                    )
+                    ret, _, _ = run_command(reposync_cmd)
+                    if not ret:
+                        continue
 
-                LOGGER.info(
-                    'repo: %s: failed. clearing cache and re-running.', repo
-                )
-                shutil.rmtree('%s/cache' % repo_path)
+                    LOGGER.info(
+                        'repo: {}: failed. clearing cache '
+                        'and re-running.'.format(repo)
+                    )
+                    shutil.rmtree(tmp_cache_dir)
+                    os.mkdir(tmp_cache_dir)
 
-                ret, out, err = run_command(reposync_cmd)
-                if ret:
-                    LOGGER.error(
-                        'reposync command failed for repoid: %s', repo
-                    )
-                    LOGGER.error(
-                        'reposync stdout for repoid: %s: \n%s', repo, out
-                    )
-                    LOGGER.error(
-                        'reposync stderr for repoid: %s: \n%s', repo, err
-                    )
+                    ret, out, err = run_command(reposync_cmd)
+                    if ret:
+                        LOGGER.error(
+                            'reposync command failed for '
+                            'repoid: {}'.format(repo)
+                        )
+                        LOGGER.error(
+                            'reposync stdout for '
+                            'repoid: {}: \n{}', repo, out
+                        )
+                        LOGGER.error(
+                            'reposync stderr for '
+                            'repoid: {}: \n{}', repo, err
+                        )
 
-                    raise RuntimeError(
-                        (
-                            'Failed to run reposync 3 times '
-                            'for repoid: %s, aborting.'
-                        ) % repo
-                    )
+                        raise RuntimeError(
+                            (
+                                'Failed to run reposync 3 times '
+                                'for repoid: {}, aborting.'
+                            ).format(repo)
+                        )
+        finally:
+            LOGGER.debug('Removing temp cache dir {}'.format(tmp_dir))
+            shutil.rmtree(tmp_dir)
