@@ -33,7 +33,9 @@ die() {
 }
 
 setup_tox() {
-    pip install --upgrade pip setuptools virtualenv tox || return 1
+    for package in "pip" "setuptools" "virtualenv" "tox" ; do
+        pip install --upgrade "$package" || return 1
+    done
 }
 
 build_docs() {
