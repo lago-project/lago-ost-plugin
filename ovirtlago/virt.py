@@ -18,6 +18,7 @@
 # Refer to the README and COPYING files for full details of the license
 #
 import os
+import requests
 import time
 import warnings
 import lago
@@ -253,6 +254,7 @@ class EngineVM(lago.vm.DefaultVM):
         super(EngineVM, self).__init__(*args, **kwargs)
         self._api_v3 = None
         self._api_v4 = None
+        self._cert = None
 
     def stop(self):
         super(EngineVM, self).stop()
@@ -262,8 +264,28 @@ class EngineVM(lago.vm.DefaultVM):
         inherited_artifacts = super(EngineVM, self)._artifact_paths()
         return set(inherited_artifacts + ['/var/log'])
 
+    def _download_ca_cert(self):
+        url = constants.ENGINE_BASEURL.format(
+            self.ip()
+        ) + '/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA'
+        retries = 20
+        while retries:
+            resp = requests.request('GET', url, verify=False)
+            if resp.ok:
+                with open('engine-ca.pem', 'w+b') as outfile:
+                    outfile.write(resp.content)
+                self._cert = 'engine-ca.pem'
+                return
+            else:
+                LOGGER.debug(
+                    'CA cert not found: HTTP status %s (%s retries left)' %
+                    (resp.status_code, retries)
+                )
+                retries -= 1
+                time.sleep(3)
+
     def _create_api(self, api_ver):
-        url = 'https://%s/ovirt-engine/api' % self.ip()
+        url = constants.ENGINE_BASEURL.format(self.ip()) + '/api'
         if api_ver == 3:
             if '3' not in available_sdks():
                 raise RuntimeError('oVirt Python SDK v3 not found.')
@@ -277,6 +299,8 @@ class EngineVM(lago.vm.DefaultVM):
         if api_ver == 4:
             if '4' not in available_sdks():
                 raise RuntimeError('oVirt Python SDK v4 not found.')
+            if self._cert is None:
+                self._download_ca_cert()
             return sdk4.Connection(
                 url=url,
                 username=constants.ENGINE_USER,
