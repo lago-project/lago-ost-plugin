@@ -23,6 +23,7 @@ import logging
 import os
 import time
 from configparser import SafeConfigParser
+import sys
 
 import nose.core
 import nose.config
@@ -223,10 +224,12 @@ class OvirtPrefix(Prefix):
     @reposetup.with_repo_server
     def serve(self):
         try:
+            LOGGER.info('Running repo server...')
             while True:
                 time.sleep(0.1)
-        except:
-            pass
+        except KeyboardInterrupt:
+            LOGGER.info('KeyboardInterrupt, exiting...')
+            sys.exit(0)
 
     def _create_virt_env(self):
         return virt.OvirtVirtEnv.from_prefix(self)
