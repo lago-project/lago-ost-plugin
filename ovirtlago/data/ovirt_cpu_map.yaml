@@ -8,12 +8,20 @@ Intel:
   Conroe: Intel Conroe Family
   Penryn: Intel Penryn Family
   Nehalem: Intel Nehalem Family
+  Nehalem-IBRS: Intel Nehalem-IBRS Family
   Westmere: Intel Westmere Family
+  Westmere-IBRS: Intel Westmere-IBRS Family
   SandyBridge: Intel SandyBridge Family
+  SandyBridge-IBRS: Intel SandyBridg-IBRS Family
   IvyBridge: Intel SandyBridge Family
   Haswell-noTSX: Intel Haswell-noTSX Family
+  Haswell-IBRS: Intel Haswell-IBRS Family
+  Haswell-noTSX-IBRS: Intel Haswell-noTSX-IBRS Family
   Haswell: Intel Haswell Family
   Broadwell-noTSX: Intel Broadwell-noTSX Family
+  Broadwell-IBRS: Intel Broadwell-IBRS Family
+  Broadwell-noTSX-IBRS: Intel Broadwell-noTSX-IBRS Family
   Broadwell: Intel Broadwell-noTSX Family
   Skylake: Intel Skylake Family
+  Skylake-IBRS: Intel Skylake-IBRS Family
   Skylake-Client: Intel Skylake Family
