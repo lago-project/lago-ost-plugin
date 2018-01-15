@@ -216,16 +216,11 @@ def sync_rpm_repository(repo_path, yum_config, repos):
                     ret, out, err = run_command(reposync_cmd)
                     if ret:
                         LOGGER.error(
-                            'reposync command failed for '
-                            'repoid: {}'.format(repo)
-                        )
-                        LOGGER.error(
-                            'reposync stdout for '
-                            'repoid: {}: \n{}', repo, out
-                        )
-                        LOGGER.error(
-                            'reposync stderr for '
-                            'repoid: {}: \n{}', repo, err
+                            'reposync command failed for repoid: {repo_id}\n'
+                            'stdout:\n{stdout}\n'
+                            'stderr:\n{stderr}'.format(
+                                repo_id=repo, stdout=out, stderr=err
+                            )
                         )
 
                         raise RuntimeError(
