@@ -11,7 +11,13 @@ framework.
 .. _oVirt : http://www.ovirt.org
 .. _oVirt System tests : http://ovirt-system-tests.readthedocs.io
 
+Getting started
+---------------
 
+.. toctree::
+    :maxdepth: 4
+
+    Installation
 
 Changelog
 ------------
