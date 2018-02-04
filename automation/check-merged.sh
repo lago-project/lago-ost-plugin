@@ -35,6 +35,7 @@ echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 echo '~*          Running functional tests                   ~'
 echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 if [[ "$res" == "0" ]]; then
+    cat /etc/group
     set_guestfs_params
     run_full_functional_tests \
     || res=$?
