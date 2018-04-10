@@ -64,6 +64,7 @@ class OvirtPrefix(Prefix):
         repoman_config,
         custom_sources=None,
         projects_list=None,
+        sub_repo_name='default'
     ):
 
         if not projects_list:
@@ -92,8 +93,12 @@ class OvirtPrefix(Prefix):
                 ],
             )
 
+        internal_repo_path = os.path.join(
+            self.paths.internal_repo(), sub_repo_name
+        )
+
         reposetup.merge(
-            output_dir=self.paths.internal_repo(),
+            output_dir=internal_repo_path,
             sources=custom_sources + rpm_dirs,
             repoman_config=repoman_config,
         )
@@ -105,7 +110,8 @@ class OvirtPrefix(Prefix):
         reposync_yum_config=None,
         repoman_config=None,
         skip_sync=False,
-        custom_sources=None
+        custom_sources=None,
+        sub_repo_name='default'
     ):
         # Detect distros from template metadata
         engine_dists = [self.virt_env.engine_vm().distro()] \
@@ -163,6 +169,7 @@ class OvirtPrefix(Prefix):
             repo_names=repos,
             repoman_config=repoman_config,
             custom_sources=custom_sources or [],
+            sub_repo_name=sub_repo_name
         )
         self.save()
 
