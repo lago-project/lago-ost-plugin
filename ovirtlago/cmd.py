@@ -140,11 +140,17 @@ def do_ovirt_runtest(prefix, test_file, **kwargs):
     action='store',
     default=None,
 )
+@cli_plugin_add_argument(
+    '--repo-name',
+    help='The name of the repo that will be created in the prefix.',
+    action='store',
+    default='default',
+)
 @in_ovirt_prefix
 @with_logging
 def do_ovirt_reposetup(
     prefix, rpm_repo, reposync_yum_config, repoman_config, skip_sync,
-    custom_sources, **kwargs
+    custom_sources, repo_name, **kwargs
 ):
 
     if rpm_repo is None:
@@ -156,6 +162,7 @@ def do_ovirt_reposetup(
         skip_sync=skip_sync,
         custom_sources=custom_sources,
         repoman_config=repoman_config,
+        sub_repo_name=repo_name
     )
 
 
