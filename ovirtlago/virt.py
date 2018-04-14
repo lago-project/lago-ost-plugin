@@ -340,6 +340,10 @@ class EngineVM(lago.vm.DefaultVM):
                 raise RuntimeError('Could not connect to engine')
         return self._api_v4
 
+    def get_api_v4_system_service(self):
+        api = self.get_api_v4(False)
+        return api.system_service()
+
     def add_iso(self, path):
         iso_name = os.path.basename(path)
         self.copy_to(path, '.')
