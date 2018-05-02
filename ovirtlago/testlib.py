@@ -81,6 +81,18 @@ def with_ovirt_api4(func):
     return wrapper
 
 
+def with_ovirt_api4_service(func):
+    @functools.wraps(func)
+    @with_ovirt_prefix
+    def wrapper(prefix, *args, **kwargs):
+        return func(
+            prefix.virt_env.engine_vm().get_api_v4_system_service(), *args,
+            **kwargs
+        )
+
+    return wrapper
+
+
 def _vms_capable(vms, caps):
     caps = set(caps)
 
