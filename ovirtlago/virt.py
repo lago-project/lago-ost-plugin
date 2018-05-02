@@ -376,15 +376,14 @@ class EngineVM(lago.vm.DefaultVM):
             raise RuntimeError('Failed to setup the engine')
 
     @require_sdk(version='4')
-    def _search_vms(self, api, query):
-        vms_service = api.system_service().vms_service()
+    def _search_vms(self, vms_service, query):
         return [vm.id for vm in vms_service.list(search=query)]
 
     @require_sdk(version='4')
     def start_all_vms(self, timeout=8 * 60):
         api = self.get_api_v4(check=True)
         vms_service = api.system_service().vms_service()
-        ids = self._search_vms(api, query='status=down')
+        ids = self._search_vms(vms_service, query='status=down')
         [vms_service.vm_service(id).start() for id in ids]
 
         def _vm_is_up(id):
@@ -403,19 +402,21 @@ class EngineVM(lago.vm.DefaultVM):
     def stop_all_vms(self, timeout=5 * 60):
         api = self.get_api_v4(check=True)
         vms_service = api.system_service().vms_service()
-        ids = self._search_vms(api, query='status=up')
+        ids = self._search_vms(
+            vms_service, query='status=up and name!=HostedEngine'
+        )
         [vms_service.vm_service(id).stop() for id in ids]
 
-        def _vm_is_down(id):
-            vm_srv = vms_service.vm_service(id)
-            vm = vm_srv.get()
+        def _vm_is_down(srv, id):
+            vm = srv.get()
             if vm.status == otypes.VmStatus.DOWN:
                 LOGGER.debug('Engine VM ID %s, is down', id)
                 return True
 
         for id in ids:
+            vm_srv = vms_service.vm_service(id)
             testlib.assert_true_within(
-                partial(_vm_is_down, id=id), timeout=timeout
+                partial(_vm_is_down, srv=vm_srv, id=id), timeout=timeout
             )
 
     @require_sdk(version='4')
