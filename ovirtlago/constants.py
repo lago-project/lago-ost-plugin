@@ -26,3 +26,4 @@ ANSWER_FILES_DIR = os.path.join(DATA_DIR, 'config', 'answer-files')
 REPO_SERVER_PORT = 8585
 ENGINE_USER = 'admin@internal'
 ENGINE_PASSWORD = '123'
+ENGINE_BASEURL = 'https://{0}/ovirt-engine'
