@@ -189,6 +189,18 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
                  '{1}').format(cluster.id, cpu_family)
             )
 
+    def _get_check_running_allowed_exceptions(self):
+        """
+        In lago 0.44 "check_running" decorator raises
+        LagoVMNotRunningError if the VM isn't running
+        """
+
+        allowed_exceptions = []
+        if getattr(lago.plugins.vm, 'LagoVMNotRunningError', None):
+            allowed_exceptions.append(lago.plugins.vm.LagoVMNotRunningError)
+
+        return allowed_exceptions
+
     def assert_vdsm_alive(self, timeout=2 * 60):
         """
         Assert service 'vdsmd' reports running on all vdsm hosts
@@ -211,7 +223,10 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
 
         for host in self.host_vms():
             testlib.assert_true_within(
-                partial(_vdsm_up, host), timeout=timeout
+                partial(_vdsm_up, host),
+                timeout=timeout,
+                allowed_exceptions=self._get_check_running_allowed_exceptions(
+                ),
             )
 
     def assert_engine_alive(self, timeout=2 * 60):
@@ -235,7 +250,9 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
             return status
 
         testlib.assert_true_within(
-            partial(_ovirt_engine_up, self.engine_vm()), timeout=timeout
+            partial(_ovirt_engine_up, self.engine_vm()),
+            timeout=timeout,
+            allowed_exceptions=self._get_check_running_allowed_exceptions(),
         )
 
 
