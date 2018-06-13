@@ -3,7 +3,7 @@ nose
 configparser
 setuptools
 futures
-yapf
+yapf==0.20
 pytest-cov
 flake8
 dulwich
