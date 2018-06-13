@@ -17,7 +17,6 @@
 #
 # Refer to the README and COPYING files for full details of the license
 #
-import BaseHTTPServer
 import contextlib
 import functools
 import os
@@ -25,6 +24,7 @@ import threading
 import pkg_resources
 import sys
 from SimpleHTTPServer import SimpleHTTPRequestHandler
+from SocketServer import ThreadingTCPServer
 
 from . import constants
 
@@ -58,6 +58,13 @@ def generate_request_handler(root_dir):
     return _BetterHTTPRequestHandler
 
 
+class LagoThreadingTCPServer(ThreadingTCPServer):
+    """
+    A custom multi-threaded TCP server.
+    """
+    allow_reuse_address = True
+
+
 def _create_http_server(listen_ip, listen_port, root_dir):
     """
     Starts an http server with an improved request handler
@@ -68,10 +75,10 @@ def _create_http_server(listen_ip, listen_port, root_dir):
         root_dir (str): path to the directory to serve
 
     Returns:
-        BaseHTTPServer: instance of the http server, already running on a
-            thread
+        LagoThreadingTCPServer: instance of the http server, already running
+            on a thread.
     """
-    server = BaseHTTPServer.HTTPServer(
+    server = LagoThreadingTCPServer(
         (listen_ip, listen_port),
         generate_request_handler(root_dir),
     )
