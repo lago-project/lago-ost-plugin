@@ -43,13 +43,14 @@ def generate_request_handler(root_dir):
 
     class _BetterHTTPRequestHandler(SimpleHTTPRequestHandler):
         __root_dir = root_dir
+        _len_cwd = len(os.getcwd())
 
         def translate_path(self, path):
             return os.path.join(
                 self.__root_dir,
                 SimpleHTTPRequestHandler.translate_path(
                     self, path
-                )[len(os.getcwd()):].lstrip('/')
+                )[self._len_cwd:].lstrip('/')
             )
 
         def log_message(self, *args, **kwargs):
