@@ -17,11 +17,66 @@
 #
 # Refer to the README and COPYING files for full details of the license
 #
-import BaseHTTPServer
 import contextlib
+import errno
+import logging
 import os
 import threading
 from SimpleHTTPServer import SimpleHTTPRequestHandler
+from SocketServer import ThreadingTCPServer
+import sys
+import traceback
+
+LOGGER = logging.getLogger(__name__)
+
+
+class LagoThreadingTCPServer(ThreadingTCPServer):
+    """ A custom multi-threaded TCP server.
+
+    We use `allow_reuse_address` in order to avoid a race when opening and
+    closing multiple servers (at each point in time only one server is
+    listening).
+    For example, the first server has a connection in 'time_wait' state,
+    while the second server tries to bind its socket.
+
+    Attributes:
+        _allowed_exceptions(tuple of Exceptions): If an exception occurs
+            and its type isn't not in `_allowed_exceptions`, its traceback
+            will be printed to the log.
+        _allowed_errnos(tuple of ints): If an OSError exception occurs
+            and its errno isn't not in `_allowed_errnos`, its traceback
+            will be printed to the log.
+    """
+    allow_reuse_address = True
+
+    def __init__(
+        self,
+        server_address,
+        RequestHandlerClass,
+        allowed_exceptions=(),
+        allowed_errnos=(errno.EPIPE, ),
+    ):
+        # We can't use super since the superclass isn't  a new style class
+        ThreadingTCPServer.__init__(self, server_address, RequestHandlerClass)
+        self._allowed_exceptions = allowed_exceptions
+        self._allowed_errnos = allowed_errnos
+
+    def handle_error(self, request, client_address):
+        """ Handle an error gracefully
+
+        Overrides the default implementation which prints
+        the error to stdout and stderr
+        """
+        _, value, _ = sys.exc_info()
+        ignore_err_conditions = [
+            hasattr(value, 'errno') and value.errno in self._allowed_errnos,
+            isinstance(value, self._allowed_exceptions),
+        ]
+
+        if any(ignore_err_conditions):
+            return
+
+        LOGGER.debug(traceback.format_exc())
 
 
 def generate_request_handler(root_dir):
@@ -67,7 +122,7 @@ def _create_http_server(listen_ip, listen_port, root_dir):
         BaseHTTPServer: instance of the http server, already running on a
             thread
     """
-    server = BaseHTTPServer.HTTPServer(
+    server = LagoThreadingTCPServer(
         (listen_ip, listen_port),
         generate_request_handler(root_dir),
     )
