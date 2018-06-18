@@ -23,8 +23,6 @@ import os
 import threading
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 
-from . import constants
-
 
 def generate_request_handler(root_dir):
     """
@@ -78,24 +76,21 @@ def _create_http_server(listen_ip, listen_port, root_dir):
 
 
 @contextlib.contextmanager
-def repo_server_context(prefix):
+def repo_server_context(gw_ip, port, root_dir):
     """
-    Context manager that starts an http server that serves the given prefix's
-    yum repository. Will listen on :class:`constants.REPO_SERVER_PORT` and on
-    the first network defined in the previx virt config
+    Context manager that starts a generic http server that serves `root_dir`,
+    and listens on `gw_ip`:`port`.
 
     Args:
-        prefix(ovirtlago.prefix.OvirtPrefix): prefix to start the server for
-
-    Returns:
-        None
+        gw_ip(str): IP to listen on
+        port(int): Port to listen on
+        root_dir(str): The root directory that will be served.
     """
-    gw_ip = prefix.virt_env.get_net().gw()
-    port = constants.REPO_SERVER_PORT
+
     server = _create_http_server(
         listen_ip=gw_ip,
         listen_port=port,
-        root_dir=prefix.paths.internal_repo(),
+        root_dir=root_dir,
     )
     try:
         yield
