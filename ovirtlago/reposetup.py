@@ -32,7 +32,7 @@ from lago.utils import (
     LockFile,
 )
 
-from . import utils
+from ovirtlago import constants, server
 
 LOGGER = logging.getLogger(__name__)
 LogTask = functools.partial(log_utils.LogTask, logger=LOGGER)
@@ -106,9 +106,24 @@ def merge(output_dir, sources, repoman_config=None):
 
 
 def with_repo_server(func):
+    """
+    Context manger that starts an http server which serves
+    the prefix's internal_repo. The server will listen on the
+    management network's IP, and on port `constans.REPO_SERVER_PORT`
+
+    Args:
+        The first argument to the wrapped func should be a
+            `lago.prefix.Prefix` instance.
+    """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        with utils.repo_server_context(args[0]):
+        prefix = args[0]
+        with server.repo_server_context(
+            gw_ip=prefix.virt_env.get_net().gw(),
+            port=constants.REPO_SERVER_PORT,
+            root_dir=prefix.paths.internal_repo(),
+        ):
             return func(*args, **kwargs)
 
     return wrapper

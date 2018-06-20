@@ -17,93 +17,9 @@
 #
 # Refer to the README and COPYING files for full details of the license
 #
-import BaseHTTPServer
-import contextlib
 import functools
-import os
-import threading
 import pkg_resources
 import sys
-from SimpleHTTPServer import SimpleHTTPRequestHandler
-
-from . import constants
-
-
-def generate_request_handler(root_dir):
-    """
-    Factory for _BetterHTTPRequestHandler classes
-
-    Args:
-        root_dir (path): Path to the dir to serve
-
-    Returns:
-        _BetterHTTPRequestHandler: A ready to be used improved http request
-            handler
-    """
-
-    class _BetterHTTPRequestHandler(SimpleHTTPRequestHandler):
-        __root_dir = root_dir
-        _len_cwd = len(os.getcwd())
-
-        def translate_path(self, path):
-            return os.path.join(
-                self.__root_dir,
-                SimpleHTTPRequestHandler.translate_path(
-                    self, path
-                )[self._len_cwd:].lstrip('/')
-            )
-
-        def log_message(self, *args, **kwargs):
-            pass
-
-    return _BetterHTTPRequestHandler
-
-
-def _create_http_server(listen_ip, listen_port, root_dir):
-    """
-    Starts an http server with an improved request handler
-
-    Args:
-        listen_ip (str): Ip to listen on
-        port (int): Port to register on
-        root_dir (str): path to the directory to serve
-
-    Returns:
-        BaseHTTPServer: instance of the http server, already running on a
-            thread
-    """
-    server = BaseHTTPServer.HTTPServer(
-        (listen_ip, listen_port),
-        generate_request_handler(root_dir),
-    )
-    threading.Thread(target=server.serve_forever).start()
-    return server
-
-
-@contextlib.contextmanager
-def repo_server_context(prefix):
-    """
-    Context manager that starts an http server that serves the given prefix's
-    yum repository. Will listen on :class:`constants.REPO_SERVER_PORT` and on
-    the first network defined in the previx virt config
-
-    Args:
-        prefix(ovirtlago.prefix.OvirtPrefix): prefix to start the server for
-
-    Returns:
-        None
-    """
-    gw_ip = prefix.virt_env.get_net().gw()
-    port = constants.REPO_SERVER_PORT
-    server = _create_http_server(
-        listen_ip=gw_ip,
-        listen_port=port,
-        root_dir=prefix.paths.internal_repo(),
-    )
-    try:
-        yield
-    finally:
-        server.shutdown()
 
 
 def get_data_file(basename):
