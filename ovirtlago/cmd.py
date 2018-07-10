@@ -91,12 +91,19 @@ def do_ovirt_revert(prefix, snapshot_name, **kwargs):
     help='Path to tests file to run',
     metavar='TEST_FILE',
 )
+@cli_plugin_add_argument(
+    '--junitxml-file',
+    help='Directory/file name to store junit xml file',
+    dest='junitxml_file',
+    type=str,
+    default=None,
+)
 @in_ovirt_prefix
 @with_logging
-def do_ovirt_runtest(prefix, test_file, **kwargs):
+def do_ovirt_runtest(prefix, test_file, junitxml_file, **kwargs):
     if not os.path.exists(test_file):
         raise RuntimeError('Test file not found')
-    if not prefix.run_test(test_file):
+    if not prefix.run_test(test_file, junitxml_file):
         raise RuntimeError('Some tests failed')
 
 
