@@ -20,6 +20,7 @@
 #
 import logging
 import os
+import pkg_resources
 import sys
 import textwrap
 import warnings
@@ -341,6 +342,12 @@ def do_ovirt_serve(prefix, **kwargs):
 
 
 def _populate_parser(cli_plugins, parser):
+    parser.add_argument(
+        '--version',
+        action='version',
+        version='%(prog)s ' +
+        pkg_resources.get_distribution('lago-ovirt').version,
+    )
     verbs_parser = parser.add_subparsers(
         dest='ovirtverb',
         metavar='VERB',
