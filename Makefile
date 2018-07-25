@@ -49,6 +49,12 @@ build:
 check: check-local
 
 check-local:
+	@# Check SSL backend for pycurl
+	@if curl-config --configure | grep -q '\-\-with\-nss'; then \
+		export PYCURL_SSL_LIBRARY=nss; \
+	else \
+		export PYCURL_SSL_LIBRARY=openssl; \
+	fi; \
 	tox -r -e py27
 
 dist: ${TARBALL_DIST_LOCATION}
@@ -89,3 +95,4 @@ clean:
 
 docs:
 	tox -r -e docs
+

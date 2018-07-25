@@ -5,3 +5,8 @@ python-dulwich
 python-pip
 yum
 yum-utils
+libcurl-devel
+libvirt-devel
+openssl-devel
+libxml2-devel
+

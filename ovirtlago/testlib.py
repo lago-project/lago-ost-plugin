@@ -26,7 +26,8 @@ import unittest.case
 import nose.plugins
 from nose.plugins.skip import SkipTest
 
-from lago import (utils, log_utils, cmd as lago_cmd)
+from lago import (utils, log_utils)
+from lago.plugins.vm import (ExtractPathError, ExtractPathNoPathError)
 
 import ovirtlago
 
@@ -167,11 +168,13 @@ class LogCollectorPlugin(nose.plugins.Plugin):
     def _addFault(self, test, err):
         suffix = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         test_name = '%s-%s' % (test.id(), suffix)
-        lago_cmd.do_collect(
-            prefix=self._prefix,
-            output=self._prefix.paths.test_logs(test_name),
-            no_skip=False
-        )
+
+        try:
+            self._prefix.collect_artifacts(
+                self._prefix.paths.test_logs(test_name), False
+            )
+        except (ExtractPathError, ExtractPathNoPathError) as e:
+            LOGGER.debug(e, exc_info=True)
 
 
 class TaskLogNosePlugin(nose.plugins.Plugin):

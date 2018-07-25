@@ -6,3 +6,7 @@ grubby
 python2-devel
 python2-dulwich
 python-pip
+libcurl-devel
+libvirt-devel
+openssl-devel
+libxml2-devel

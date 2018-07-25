@@ -42,8 +42,12 @@ class TestUtilsOvirtSDKs(object):
 
     @pytest.mark.parametrize(
         ('modules', 'version'), [
-            (['ovirtsdk4'], '4'), (['ovirtsdk'], '3'),
-            (['ovirtsdk', 'dummy'], '3'), (['ovirtsdk', 'ovirtsdk4'], '3')
+            (['ovirtsdk4'], '4'),
+            (['ovirtsdk'], '3'),
+            (['ovirtsdk', 'dummy'], '3'),
+            (['ovirtsdk', 'ovirtsdk4'], '3'),
+            ([], '3'),
+            ([], '4'),
         ]
     )
     def test_require_sdk(self, modules, version):
@@ -58,7 +62,6 @@ class TestUtilsOvirtSDKs(object):
             (['ovirtsdk4'], '3'),
             (['ovirtsdk'], '4'),
             (['ovirtsdk', 'dummy'], '4'),
-            ({}, '4'),
         ]
     )
     def test_require_sdk_mismatch(self, modules, version):
