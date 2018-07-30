@@ -12,3 +12,4 @@ lago
 mock
 ovirt-engine-sdk-python
 ovirt-engine-sdk===3.2.0.11-SNAPSHOT
+future

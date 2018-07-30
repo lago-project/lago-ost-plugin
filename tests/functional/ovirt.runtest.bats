@@ -41,6 +41,24 @@ unset LAGO__START__WAIT_SUSPEND
     done
 }
 
+@test "ovirt.runtest: simple runtest to verify junitxml_dir" {
+    common.is_initialized "$WORKDIR" || skip "Workdir not initiated"
+    cd "$FIXTURES"
+
+    local testfiles=(
+        "001_basic_test.py"
+    )
+
+    for testfile in "${testfiles[@]}"; do
+        local junitxml_file="$PREFIX/junit_xml/$testfile.junit.xml"
+        helpers.run_ok "$LAGOCLI" ovirt runtest --junitxml-file "$junitxml_file" "$testfile"
+        helpers.contains "$output" "${testfile%.*}.test_pass"
+        helpers.is_file "$junitxml_file"
+        helpers.contains \
+            "$(cat $junitxml_file)" \
+            'errors="0"'
+    done
+}
 
 @test "ovirt.runtest: failing a test fails the run" {
     common.is_initialized "$WORKDIR" || skip "Workdir not initiated"

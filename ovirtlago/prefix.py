@@ -24,6 +24,7 @@ import os
 import time
 from configparser import SafeConfigParser
 import sys
+from future.builtins import super
 
 import nose.core
 import nose.config
@@ -47,6 +48,61 @@ PROJECTS_LIST = [
 LOGGER = logging.getLogger(__name__)
 LogTask = functools.partial(log_utils.LogTask, logger=LOGGER)
 log_task = functools.partial(log_utils.log_task, logger=LOGGER)
+
+
+def _create_output_filename(
+    default_dir, default_filename, output_filename=None
+):
+    """
+    Given a default_dir, default_filename, output_filename(optional)
+    returns the result_path
+
+    Args:
+        default_dir (str): Containing the default directory for keeping
+        the log file
+        default_filename (str): Containing the default filename for the
+        log file
+        output_filename (str): Containing the requested filename for
+        the log file (can be a filename or a full/relative path)
+
+    Returns:
+        str: results_path represents the fullname of the output file
+        ( dir + basename )
+    """
+
+    if output_filename:
+        dirname, basename = os.path.split(output_filename)
+        if dirname:
+            default_dir = dirname
+        if basename:
+            default_filename = basename
+
+    results_path = os.path.abspath(
+        os.path.join(
+            default_dir,
+            default_filename,
+        )
+    )
+    return results_path
+
+
+def _safe_makedir(path):
+    """
+    Given a path recursivley create the directories and
+    don't fail if already exists
+
+    Args:
+        path (str): Containing the path to be created
+
+    Raises:
+        OSError: if it fails to create the directory
+        (if directory exists no exception will be raise)
+    """
+    try:
+        os.makedirs(path)
+    except OSError as e:
+        if e.errno != os.errno.EEXIST:
+            raise
 
 
 class OvirtPrefix(Prefix):
@@ -174,17 +230,16 @@ class OvirtPrefix(Prefix):
         self.save()
 
     @reposetup.with_repo_server
-    def run_test(self, path):
+    def run_test(self, path, junitxml_file=None):
 
         with LogTask('Run test: %s' % os.path.basename(path)):
             env = os.environ.copy()
             env['LAGO_PREFIX'] = self.paths.prefix
-            results_path = os.path.abspath(
-                os.path.join(
-                    self.paths.prefix,
-                    '%s.junit.xml' % os.path.basename(path),
-                )
+            results_path = _create_output_filename(
+                self.paths.prefix,
+                os.path.basename(path) + ".junit.xml", junitxml_file
             )
+            _safe_makedir(os.path.dirname(results_path))
             extra_args = [
                 '--with-xunit',
                 '--xunit-file=%s' % results_path,
