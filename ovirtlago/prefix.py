@@ -221,6 +221,8 @@ class OvirtPrefix(Prefix):
 
             LOGGER.info('Results located at %s' % results_path)
 
+            if not result:
+                sys.exit(1)
             return result
 
     @log_task('Deploy oVirt environment')
