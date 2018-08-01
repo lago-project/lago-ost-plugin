@@ -107,7 +107,7 @@ def merge(output_dir, sources, repoman_config=None):
 
 def with_repo_server(func):
     """
-    Context manger that starts an http server which serves
+    A decorator that starts an http server which serves
     the prefix's internal_repo. The server will listen on the
     management network's IP, and on port `constans.REPO_SERVER_PORT`
 
