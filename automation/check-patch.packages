@@ -10,3 +10,4 @@ libcurl-devel
 libvirt-devel
 openssl-devel
 libxml2-devel
+createrepo
