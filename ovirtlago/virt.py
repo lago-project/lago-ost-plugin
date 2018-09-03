@@ -49,7 +49,7 @@ except ImportError:
 
 class OvirtVirtEnv(lago.virt.VirtEnv):
     def __init__(self, prefix, vm_specs, net_spec):
-        self._engine_vm = None
+        self._engine_vm = []
         self._host_vms = []
         super(OvirtVirtEnv, self).__init__(prefix, vm_specs, net_spec)
 
@@ -71,12 +71,11 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
             )
 
         if provider_name == 'ovirt-engine':
-            if self._engine_vm is not None:
-                raise RuntimeError('Engine VM already exists')
-
             vm_spec['vm-type'] = provider_name
-            self._engine_vm = super(OvirtVirtEnv, self)._create_vm(vm_spec)
-            return self._engine_vm
+            self._engine_vm.append(
+                super(OvirtVirtEnv, self)._create_vm(vm_spec)
+            )
+            return self._engine_vm[-1]
 
         elif provider_name in ('ovirt-host', 'ovirt-node'):
             vm_spec['vm-type'] = provider_name
@@ -89,7 +88,13 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
             return super(OvirtVirtEnv, self)._create_vm(vm_spec)
 
     def engine_vm(self):
-        return self._engine_vm
+        if len(self._engine_vm) == 1:
+            return self._engine_vm[0]
+        else:
+            return self._engine_vm[:]
+
+    def engine_vms(self):
+        return self._engine_vm[:]
 
     def host_vms(self):
         return self._host_vms[:]
@@ -121,7 +126,7 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
             except IndexError:
                 pass
         if not host:
-            host = self.engine_vm()
+            host = self.engine_vms()[-1]
         if host is None:
             raise RuntimeError('No Engine or Host VMs found')
 
@@ -154,9 +159,12 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
         return cpu_map[host.cpu_vendor][host.cpu_model]
 
     @require_sdk(version='4')
-    def update_clusters_cpu(self, timeout=2 * 60):
+    def update_clusters_cpu(self, timeout=2 * 60, idx=0):
         cpu_family = self.get_ovirt_cpu_family()
-        api = self.engine_vm().get_api_v4(check=True)
+        if idx == 0:
+            api = self.engine_vm().get_api_v4(check=True)
+        else:
+            api = self.engine_vm()[idx].get_api_v4(check=True)
         clusters_service = api.system_service().clusters_service()
         clusters = clusters_service.list()
 
@@ -229,7 +237,7 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
                 ),
             )
 
-    def assert_engine_alive(self, timeout=2 * 60):
+    def assert_engine_alive(self, timeout=2 * 60, idx=0):
         """
         Assert service 'ovirt-engine' reports running on the engine VM
 
@@ -243,6 +251,10 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
             AssertionError: if ovirt-engine is not reported running after the
                 given timeout, or ssh is unreachable.
         """
+        if idx == 0:
+            engine_host = self.engine_vm()
+        else:
+            engine_host = self.engine_vm()[idx]
 
         def _ovirt_engine_up(host):
             status = host.service('ovirt-engine').alive()
@@ -250,7 +262,7 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
             return status
 
         testlib.assert_true_within(
-            partial(_ovirt_engine_up, self.engine_vm()),
+            partial(_ovirt_engine_up, engine_host),
             timeout=timeout,
             allowed_exceptions=self._get_check_running_allowed_exceptions(),
         )
@@ -378,7 +390,14 @@ class EngineVM(lago.vm.DefaultVM):
         if ret:
             raise RuntimeError('Failed to remove uploaded image')
 
-    def engine_setup(self, config=None):
+    @require_sdk(version='4')
+    def engine_setup(self, timeout=8 * 60):
+        api = self.get_api_v4(check=True)
+        vms_service = api.system_service().vms_service()
+        ids = self._search_vms(vms_service, query='name=HostedEngine')
+        [vms_service.vm_service(id).engine_setup_one() for id in ids]
+
+    def engine_setup_one(self, config=None):
         self.wait_for_ssh()
 
         if config:
