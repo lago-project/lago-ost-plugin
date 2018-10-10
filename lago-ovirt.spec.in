@@ -42,7 +42,6 @@ Requires: python-lago >= 0.39
 Requires: python-magic
 Requires: python-nose
 Requires: ovirt-engine-sdk-python >= 3.6.9.1-1
-Requires: createrepo
 Requires: repoman >= 2.0.12
 Requires: yum-utils
 Requires: rpm-build
