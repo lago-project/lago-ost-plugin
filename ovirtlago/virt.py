@@ -21,9 +21,11 @@ import os
 import time
 import warnings
 import lago
+from lago.utils import LagoException
 import lago.vm
 import logging
 import yaml
+import json
 from collections import OrderedDict
 from lago.config import config as lago_config
 from ovirtlago import utils
@@ -225,8 +227,8 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
             testlib.assert_true_within(
                 partial(_vdsm_up, host),
                 timeout=timeout,
-                allowed_exceptions=self._get_check_running_allowed_exceptions(
-                ),
+                allowed_exceptions=
+                self._get_check_running_allowed_exceptions(),
             )
 
     def assert_engine_alive(self, timeout=2 * 60):
@@ -254,6 +256,51 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
             timeout=timeout,
             allowed_exceptions=self._get_check_running_allowed_exceptions(),
         )
+
+    def set_global_maintenance(self, enable):
+        self.first_result_from_host(
+            self._set_global_maintenance, [RuntimeError], enable
+        )
+
+    def _set_global_maintenance(self, host, enable):
+        ret = host().ssh(
+            [
+                'hosted-engine', '--set-maintenance',
+                '--mode={}'.format('global' if enable else 'none')
+            ]
+        )
+        if ret:
+            raise RuntimeError('Failed to change HE maintenance mode')
+
+        testlib.assert_true_within_long(
+            lambda: self.engine_vm()
+            .he_status()['global_maintenance'] == enable
+        )
+
+    def is_up(self):
+        return all([vm.alive() for vm in self._vms.itervalues()]) \
+            and all([net.alive() for net in self._nets.itervalues()])
+
+    def is_down(self):
+        return not self.is_up()
+
+    def host_map(self, func, *args, **kwargs):
+        return (func(h, *args, **kwargs) for h in self._host_vms)
+
+    def first_result_from_host(self, func, allowed_exc, *args, **kwargs):
+        for host in self._host_vms:
+            try:
+                return func(host, *args, **kwargs)
+            except Exception as exc:
+                LOGGER.debug(
+                    '{} did not satisfy {}. Got {}'.
+                    format(host.name(), func.__name__, str(exc))
+                )
+
+                if not testlib.instance_of_any(exc, allowed_exc):
+                    raise
+
+        raise RuntimeError('No host satisfy {}'.format(func.__name__))
 
 
 # TODO : solve the problem of ssh to the Node
@@ -436,6 +483,79 @@ class EngineVM(lago.vm.DefaultVM):
                 partial(_vm_is_down, srv=vm_srv, id=id), timeout=timeout
             )
 
+    def shutdown(self):
+        if not self.is_hosted_engine():
+            return super(EngineVM, self).shutdown()
+
+    def _is_hosted_engine(self, host):
+        ret = host.ssh(['hosted-engine', '--check-deployed'], tries=5)
+
+        return not ret
+
+    def is_hosted_engine(self):
+        return self.virt_env.first_result_from_host(
+            self._is_hosted_engine,
+            [RuntimeError],
+        )
+
+    def _he_status(self, host):
+        ret = host.ssh(['hosted-engine', '--vm-status', '--json'])
+        if not ret:
+            return json.loads(ret.out)
+
+        raise RuntimeError('Failed to get HE status')
+
+    def he_status(self):
+        self.virt_env.first_result_from_host(
+            self._he_status,
+            [RuntimeError, ValueError],
+        )
+
+    def he_host(self):
+        status = self.he_status()
+        running_on = ''
+        for k, v in status.iteritems():
+            if not k.isdigit():
+                continue
+
+            if v['engine-status']['vm'] == 'up':
+                running_on = v['hostname'].split('.', 1)[0]
+                break
+        try:
+            return next(
+                h for h in self.virt_env.host_vms() if h.name() == running_on
+            )
+        except StopIteration:
+            raise HEVMIsNotRunningError()
+
+    def change_he_vm_state(self, state, verify_func):
+        LOGGER.debug('{} HE VM'.format(state))
+        ret = self.he_host().ssh(['hosted-engine', '--vm-{}'.format(state)])
+        if ret:
+            raise RuntimeError('Failed to {} HE VM'.format(state))
+
+        testlib.assert_true_within_short(verify_func)
+        LOGGER.debug('Succeed to {} HE VM'.format(state))
+
+    def shutdown_he_vm(self):
+        try:
+            self.change_he_vm_state(
+                'shutdown', lambda: all(
+                    v['engine-status']['vm'] != 'up'
+                    for k, v in self.he_status().iteritems() if k.isdigit()
+                )
+            )
+        except HEVMIsNotRunningError:
+            LOGGER.debug('HE VM is not running. Nothing to do')
+
+    def start_he_vm(self):
+        self.change_he_vm_state(
+            'start', lambda: any(
+                v['engine-status']['vm'] == 'up'
+                for k, v in self.he_status().iteritems() if k.isdigit()
+            )
+        )
+
     @require_sdk(version='4')
     def stop_all_hosts(self, timeout=5 * 60):
         api = self.get_api_v4(check=True)
@@ -556,3 +676,8 @@ class HEHostVM(HostVM):
     def _artifact_paths(self):
         inherited_artifacts = super(HEHostVM, self)._artifact_paths()
         return set(inherited_artifacts)
+
+
+class HEVMIsNotRunningError(LagoException):
+    def __init__(self):
+        super(HEVMIsNotRunningError, self).__init__('HE VM is not running')
