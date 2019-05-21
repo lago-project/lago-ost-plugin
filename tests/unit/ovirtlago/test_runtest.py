@@ -19,12 +19,15 @@ def dummy_test():
     return DummyTest(id=lambda: 123)
 
 
-@pytest.mark.parametrize('exc', [ExtractPathError, ExtractPathNoPathError])
+@pytest.mark.parametrize(
+    ('exc', 'remote_path'),
+    [(ExtractPathError, ''), (ExtractPathNoPathError, '')]
+)
 @patch('ovirtlago.testlib.LOGGER')
 def test_log_collection_should_ignore_extract_path_error(
-    mock_logger, mock_prefix, dummy_test, exc
+    mock_logger, mock_prefix, dummy_test, exc, remote_path
 ):
-    exc_instance = exc()
+    exc_instance = exc(remote_path)
     mock_prefix.collect_artifacts.side_effect = exc_instance
     log_collector = testlib.LogCollectorPlugin(mock_prefix)
     log_collector._addFault(dummy_test, None)

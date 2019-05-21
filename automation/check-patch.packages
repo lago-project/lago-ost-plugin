@@ -2,6 +2,7 @@ bats
 dnf
 dnf-command(builddep)
 git
+gcc
 grubby
 python2-devel
 python2-dulwich

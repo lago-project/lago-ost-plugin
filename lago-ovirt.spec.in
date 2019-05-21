@@ -43,7 +43,11 @@ Requires: python-magic
 Requires: python-nose
 Requires: ovirt-engine-sdk-python >= 3.6.9.1-1
 Requires: repoman >= 2.0.12
+%if 0%{?fedora} || 0%{?rhel} >= 8
+Requires: dnf-utils
+%else
 Requires: yum-utils
+%endif
 Requires: rpm-build
 Requires: xz
 %{?python_provide:%python_provide python2-%{name}}
