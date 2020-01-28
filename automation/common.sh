@@ -56,6 +56,20 @@ run_installation_tests() {
     automation/build-artifacts.sh \
     || return $?
     echo "Installing..."
+    # TODO: Advanced virt shouldn't be added for Fedora
+    echo "Adding Advanced Virt"
+    cat > /etc/yum.repos.d/advanced-virt.repo <<EOF
+[copr-fedorainfracloud.org-sbonazzo-AdvancedVirtualization]
+name=Copr repo for AdvancedVirtualization owned by sbonazzo
+baseurl=https://copr-be.cloud.fedoraproject.org/results/sbonazzo/AdvancedVirtualization/centos-stream-$basearch/
+type=rpm-md
+gpgcheck=1
+gpgkey=https://copr-be.cloud.fedoraproject.org/results/sbonazzo/AdvancedVirtualization/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
+module_hotfixes=1
+EOF
     echo "Install Lago from RPM"
     dnf install -y lago || return $?
     echo "Installing python-lago-ovirt"
