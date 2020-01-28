@@ -117,6 +117,15 @@ def get_children_per_parent(repo_path):
     return children_per_parent
 
 
+def append_parent(parents, commit, add_parent=True, add_digest=True):
+    if add_digest:
+        if commit.sha().hexdigest() not in parents:
+            parents.append(commit.sha().hexdigest())
+    if add_parent:
+        if commit.parents[0] not in parents:
+            parents.append(commit.parents[0])
+
+
 def get_first_parents(repo_path):
     repo = dulwich.repo.Repo(repo_path)
     #: these are the commits that are parents of more than one other commit
@@ -126,22 +135,14 @@ def get_first_parents(repo_path):
     for entry in repo.get_walker(order=dulwich.walk.ORDER_TOPO):
         commit = entry.commit
         if not commit.parents:
-            if commit.sha().hexdigest() not in first_parents:
-                first_parents.append(commit.sha().hexdigest())
+            append_parent(first_parents, commit, add_parent=False)
         elif len(commit.parents) == 1 and not on_merge:
-            if commit.sha().hexdigest() not in first_parents:
-                first_parents.append(commit.sha().hexdigest())
-            if commit.parents[0] not in first_parents:
-                first_parents.append(commit.parents[0])
+            append_parent(first_parents, commit)
         elif len(commit.parents) > 1 and not on_merge:
             on_merge = True
-            if commit.sha().hexdigest() not in first_parents:
-                first_parents.append(commit.sha().hexdigest())
-            if commit.parents[0] not in first_parents:
-                first_parents.append(commit.parents[0])
+            append_parent(first_parents, commit)
         elif commit.parents and commit.sha().hexdigest() in first_parents:
-            if commit.parents[0] not in first_parents:
-                first_parents.append(commit.parents[0])
+            append_parent(first_parents, commit, add_digest=False)
 
     return first_parents
 
