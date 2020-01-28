@@ -27,7 +27,7 @@ import yaml
 from collections import OrderedDict
 from lago.config import config as lago_config
 from ovirtlago import utils
-from utils import partial
+from .utils import partial
 
 import ovirtsdk.api
 from ovirtsdk.infrastructure.errors import (RequestError, ConnectionError)
@@ -142,13 +142,12 @@ class OvirtVirtEnv(lago.virt.VirtEnv):
             raise RuntimeError(
                 ('Unsupported CPU vendor: {0}. '
                  'Supported vendors: '
-                 '{1}').format(host.cpu_vendor, ','.join(cpu_map.iterkeys()))
+                 '{1}').format(host.cpu_vendor, ','.join(cpu_map))
             )
         if not cpu_map[host.cpu_vendor].get(host.cpu_model):
             raise RuntimeError(
                 ('Unsupported CPU model: {0}. Supported models: {1}').format(
-                    host.cpu_model,
-                    ','.join(cpu_map[host.cpu_vendor].iterkeys())
+                    host.cpu_model, ','.join(cpu_map[host.cpu_vendor])
                 )
             )
         return cpu_map[host.cpu_vendor][host.cpu_model]
@@ -532,7 +531,7 @@ class EngineVM(lago.vm.DefaultVM):
             ]
         )
 
-        for k, v in vars(sys_service.summary).viewitems():
+        for k, v in vars(sys_service.summary).items():
             if isinstance(v, otypes.ApiSummaryItem):
                 info['items'][k.lstrip('_')] = OrderedDict(
                     [
