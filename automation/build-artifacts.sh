@@ -3,18 +3,12 @@ readonly BUILDS=$PWD/automation-build
 readonly EXPORTS=$PWD/exported-artifacts
 readonly SPEC="lago-ovirt.spec"
 
-if hash dnf &>/dev/null; then
-    YUM="dnf"
-    BUILDDEP="dnf builddep"
-else
-    YUM="yum"
-    BUILDDEP="yum-builddep"
-fi
-echo "cleaning $YUM metadata"
-$YUM clean metadata
+BUILDDEP="dnf builddep"
+echo "cleaning dnf metadata"
+dnf clean metadata
 
 echo "Installing Lago"
-$YUM install -y lago
+dnf install -y lago
 
 echo "cleaning $BUILDS, $EXPORTS"
 rm -rf "$BUILDS" "$EXPORTS"/*{.rpm,.tar.gz}

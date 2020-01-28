@@ -52,20 +52,14 @@ run_unit_tests() {
 
 
 run_installation_tests() {
-    local yum
     local res=0
     automation/build-artifacts.sh \
     || return $?
     echo "Installing..."
-    if hash dnf &>/dev/null; then
-        yum=dnf
-    else
-        yum=yum
-    fi
     echo "Install Lago from RPM"
-    $yum install -y lago || return $?
+    dnf install -y lago || return $?
     echo "Installing python-lago-ovirt"
-    $yum install -y exported-artifacts/python-lago-ovirt-*.noarch.rpm || \
+    dnf install -y exported-artifacts/python-lago-ovirt-*.noarch.rpm || \
         return $?
     echo "Imports sanity check"
     lago ovirt -h || res=$?
