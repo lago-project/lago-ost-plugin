@@ -38,8 +38,6 @@ in_ovirt_prefix = in_prefix(
     prefix_class=OvirtPrefix,
     workdir_class=OvirtWorkdir,
 )
-# TODO: Remove this, and properly complain on unset config values
-DISTS = ['el6', 'el7', 'fc20']
 
 
 @cli_plugin(
