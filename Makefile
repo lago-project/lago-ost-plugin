@@ -5,7 +5,7 @@ TARBALL_FILE=${TAR_FILE}.gz
 SPECFILE=${NAME}.spec
 # this is needed to use the libs from venv
 
-OUTPUT_DIR=${PWD}
+OUTPUT_DIR=$(CURDIR)
 RPM_DIR=${OUTPUT_DIR}/rpmbuild
 DIST_DIR=${OUTPUT_DIR}/dist
 
