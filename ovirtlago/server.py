@@ -22,8 +22,8 @@ import errno
 import logging
 import os
 import threading
-from SimpleHTTPServer import SimpleHTTPRequestHandler
-from SocketServer import ThreadingTCPServer
+from http.server import SimpleHTTPRequestHandler
+from socketserver import ThreadingTCPServer
 import sys
 import traceback
 

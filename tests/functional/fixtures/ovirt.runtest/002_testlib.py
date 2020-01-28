@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 import nose.tools as nt
 from ovirtlago import testlib
 

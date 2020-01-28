@@ -7,7 +7,6 @@ yapf==0.20
 pytest-cov
 flake8
 dulwich
-enum
 lago
 mock
 ovirt-engine-sdk-python
