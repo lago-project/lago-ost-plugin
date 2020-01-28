@@ -70,8 +70,9 @@ def pretty_commit(commit, version=''):
     else:
         changelog_bugs = ''  # noqa
     return (
-        ('* {author_date} {author}{version}\n' if version is not None else '')
-        + '{changelog_message}\n' + '{changelog_bugs}'
+        ('* {author_date} {author}{version}\n'
+         if version is not None else '') + '{changelog_message}\n' +
+        '{changelog_bugs}'
     ).format(**vars())
 
 
