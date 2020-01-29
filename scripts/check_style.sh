@@ -18,8 +18,7 @@ fi
 yapf --version
 echo "running yapf on the following files:"
 echo "$files"
-# see: https://github.com/google/yapf/issues/325
-# yapf --diff will always exit with '0' as return code
+set +e
 yapf_diff=$(yapf --style .style.yapf --diff --parallel $files)
 
 if [[ -n "${yapf_diff// }" ]]; then
