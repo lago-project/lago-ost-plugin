@@ -29,9 +29,6 @@ from lago.config import config as lago_config
 from ovirtlago import utils
 from utils import partial
 
-import ovirtsdk.api
-from ovirtsdk.infrastructure.errors import (RequestError, ConnectionError)
-
 from . import (
     constants,
     testlib,
@@ -284,13 +281,6 @@ class EngineVM(lago.vm.DefaultVM):
         if api_ver == 3:
             if '3' not in available_sdks():
                 raise RuntimeError('oVirt Python SDK v3 not found.')
-            return ovirtsdk.api.API(
-                url=url,
-                username=constants.ENGINE_USER,
-                password=str(self.metadata['ovirt-engine-password']),
-                validate_cert_chain=False,
-                insecure=True,
-            )
         if api_ver == 4:
             if '4' not in available_sdks():
                 raise RuntimeError('oVirt Python SDK v4 not found.')
@@ -318,10 +308,7 @@ class EngineVM(lago.vm.DefaultVM):
                     return True
                 return False
 
-            testlib.assert_true_within_short(
-                get,
-                allowed_exceptions=[RequestError, ConnectionError],
-            )
+            testlib.assert_true_within_short(get)
         except AssertionError:
             raise RuntimeError('Failed to connect to the engine')
 

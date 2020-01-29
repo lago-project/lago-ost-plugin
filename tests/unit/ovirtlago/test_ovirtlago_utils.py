@@ -25,16 +25,14 @@ from ovirtlago import utils
 
 class TestUtilsOvirtSDKs(object):
     @pytest.mark.parametrize(
-        ('modules'),
-        [(['ovirtsdk4', 'ovirtsdk']), (['ovirtsdk4', 'ovirtsdk', 'dummy'])]
+        ('modules'), [(['ovirtsdk4']), (['ovirtsdk4', 'dummy'])]
     )
     def test_available_all(self, modules):
-        assert utils.available_sdks(modules=modules) == ['3', '4']
+        assert utils.available_sdks(modules=modules) == ['4']
 
     @pytest.mark.parametrize(
         ('modules', 'require'), [
-            (['ovirtsdk4'], ['4']), (['ovirtsdk'], ['3']),
-            (['ovirtsdk', 'dummy'], ['3'])
+            (['ovirtsdk4'], ['4']),
         ]
     )
     def test_available_one(self, modules, require):
@@ -43,10 +41,6 @@ class TestUtilsOvirtSDKs(object):
     @pytest.mark.parametrize(
         ('modules', 'version'), [
             (['ovirtsdk4'], '4'),
-            (['ovirtsdk'], '3'),
-            (['ovirtsdk', 'dummy'], '3'),
-            (['ovirtsdk', 'ovirtsdk4'], '3'),
-            ([], '3'),
             ([], '4'),
         ]
     )
@@ -59,7 +53,6 @@ class TestUtilsOvirtSDKs(object):
 
     @pytest.mark.parametrize(
         ('modules', 'version'), [
-            (['ovirtsdk4'], '3'),
             (['ovirtsdk'], '4'),
             (['ovirtsdk', 'dummy'], '4'),
         ]
