@@ -1,4 +1,5 @@
 *.py[co]
+__pycache__
 *.spec
 .*.sw[o-z]
 MANIFEST
@@ -13,6 +14,8 @@ docs/ovirtlago.rst
 docs/lago.rst
 docs/lago.plugins.rst
 docs/lago_template_repo.rst
+docs/_build/
+docs/_static/ChangeLog.txt
 *ChangeLog
 rpmbuild
 lago.egg-info
@@ -20,5 +23,13 @@ AUTHORS
 */*venv
 .bash*
 .cache*
+.coverage
+.eggs/
+.tox/
+coverage.xml
+flake8.txt
+htmlcov/
 tags
 cscope.out
+lago.junit.xml
+lago_ovirt.egg-info/
