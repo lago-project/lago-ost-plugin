@@ -7,9 +7,9 @@ Group: System Environment/Libraries
 License: GPLv2+
 URL: https://github.com/lago-project/lago-ost-plugin
 Source0: https://resources.ovirt.org/repos/lago/0.0/src/%{name}/%{name}-%{version}.tar.gz
-BuildRequires: python2-devel
+BuildRequires: python3-devel
 Requires: lago >= 0.39
-Requires: python-%{name} = %{version}
+Requires: python3-%{name} = %{version}
 Provides: lago-ost-plugin
 
 %description
@@ -20,10 +20,10 @@ A Lago plugin to create an oVirt testing environment
 %setup -q -n %{name}-%{version}
 
 %build
-OVIRTLAGO_VERSION=%{version} %{py2_build}
+OVIRTLAGO_VERSION=%{version} %{py3_build}
 
 %install
-OVIRTLAGO_VERSION=%{version} %{py2_install}
+OVIRTLAGO_VERSION=%{version} %{py3_install}
 
 install -d %{buildroot}/var/lib/lago/reposync
 install -d -m 755 %{buildroot}%{_sysconfdir}/firewalld/services
@@ -32,38 +32,35 @@ install -p -D -m 644 etc/firewalld/services/* %{buildroot}%{_sysconfdir}/firewal
 
 %files -n %{name}
 
-###################### python-lago-ovirt package
-%package -n python-%{name}
+###################### python3-lago-ovirt package
+%package -n python3-%{name}
 Summary: Library for ovirt specific facitilies
 BuildArch: noarch
-BuildRequires: python2-devel
-Requires: python
-Requires: python-lago >= 0.39
-Requires: python-magic
-Requires: python-nose
-Requires: ovirt-engine-sdk-python >= 3.6.9.1-1
+BuildRequires: python3-devel
+Requires: python3
+Requires: python3-lago >= 0.39
+Requires: python3-magic
+Requires: python3-nose
+Requires: python3-ovirt-engine-sdk4 >= 3.6.9.1-1
 Requires: repoman >= 2.0.12
-%if 0%{?fedora} || 0%{?rhel} >= 8
 Requires: dnf-utils
-%else
-Requires: yum-utils
-%endif
 Requires: rpm-build
 Requires: xz
-%{?python_provide:%python_provide python2-%{name}}
-%{?python_provide:%python_provide python2-lago-ost-plugin}
+%{?python_provide:%python_provide python3-%{name}}
+%{?python_provide:%python_provide python3-lago-ost-plugin}
 
-%description -n python-%{name}
+%description -n python3-%{name}
 
-%files -n python-%{name}
-%{python2_sitelib}/ovirtlago/*.py*
-%{python2_sitelib}/ovirtlago/data/*.yaml
-%{python2_sitelib}/lago_ovirt-%{version}-py*.egg-info
+%files -n python3-%{name}
+%{python3_sitelib}/ovirtlago/*.py*
+%{python3_sitelib}/ovirtlago/__pycache__/*.py*
+%{python3_sitelib}/ovirtlago/data/*.yaml
+%{python3_sitelib}/lago_ovirt-%{version}-py*.egg-info
 
 %config(noreplace) %{_sysconfdir}/firewalld/services/*
 %dir %attr(2775, root, lago) /var/lib/lago/reposync/
 
-%post -n python-%{name}
+%post -n python3-%{name}
 if firewall-cmd --state &>/dev/null; then
     # don't touch if ovirtlago service is already enabled
     if ! firewall-cmd --query-service=ovirtlago --zone=public -q; then
@@ -74,7 +71,7 @@ if firewall-cmd --state &>/dev/null; then
 fi
 
 
-%preun  -n python-%{name}
+%preun  -n python3-%{name}
 if [[ "$1" == "0" ]]; then
     # "0" indicates uninstallation
     # "1" indicates upgrade - and then we do nothing

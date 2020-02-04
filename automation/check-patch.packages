@@ -4,9 +4,9 @@ dnf-command(builddep)
 git
 gcc
 grubby
-python2-devel
-python2-dulwich
-python-pip
+python3-devel
+python3-dulwich
+python3-pip
 libcurl-devel
 libvirt-devel
 openssl-devel

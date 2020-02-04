@@ -30,7 +30,7 @@ if [[ -n "${yapf_diff// }" ]]; then
     Yapf failed, make sure to run:
         yapf --style .style.yapf --in-place --recursive .
 
-    If you want to make it run faster, on python2 ensure you have 'futures'
+    If you want to make it run faster, on python3 ensure you have 'futures'
     installed from pip and run:
         yapf --style .style.yapf --in-place --parallel --recursive .
 
