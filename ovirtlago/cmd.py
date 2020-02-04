@@ -18,6 +18,8 @@
 #
 # Refer to the README and COPYING files for full details of the license
 #
+from __future__ import absolute_import
+
 import logging
 import os
 import pkg_resources
@@ -38,8 +40,6 @@ in_ovirt_prefix = in_prefix(
     prefix_class=OvirtPrefix,
     workdir_class=OvirtWorkdir,
 )
-# TODO: Remove this, and properly complain on unset config values
-DISTS = ['el6', 'el7', 'fc20']
 
 
 @cli_plugin(
