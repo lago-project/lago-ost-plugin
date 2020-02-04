@@ -55,7 +55,7 @@ check-local:
 	else \
 		export PYCURL_SSL_LIBRARY=openssl; \
 	fi; \
-	tox -r -e py27
+	tox -r -e py
 
 dist: ${TARBALL_DIST_LOCATION}
 
