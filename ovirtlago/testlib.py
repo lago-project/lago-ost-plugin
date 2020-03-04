@@ -29,7 +29,6 @@ from nose.plugins.skip import SkipTest
 from lago import (utils, log_utils)
 from lago.plugins.vm import (ExtractPathError, ExtractPathNoPathError)
 
-import ovirtlago
 
 LOGGER = logging.getLogger(__name__)
 SHORT_TIMEOUT = 3 * 60
@@ -39,6 +38,9 @@ _test_prefix = None
 
 
 def get_test_prefix():
+    # Needs to be here to break circular dependency
+    import ovirtlago.prefix
+
     global _test_prefix
     if _test_prefix is None:
         cur_workdir_path = os.environ.get('LAGO_WORKDIR_PATH', os.curdir)
