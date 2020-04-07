@@ -339,7 +339,7 @@ class EngineVM(lago.vm.DefaultVM):
 
             return testapi
 
-    def get_api(self, api_ver=3):
+    def get_api(self, api_ver=4):
         if api_ver == 3:
             return self.get_api_v3()
         if api_ver == 4:
