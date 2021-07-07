@@ -170,8 +170,14 @@ class OvirtPrefix(Prefix):
         sub_repo_name='default'
     ):
         # Detect distros from template metadata
-        engine_dists = [self.virt_env.engine_vm().distro()] \
-            if self.virt_env.engine_vm() else []
+        if isinstance(self.virt_env.engine_vm(), list):
+            engine_dists = list(
+                set([host.distro() for host in self.virt_env.engine_vm()])
+            )
+        else:
+            engine_dists = [self.virt_env.engine_vm().distro()] \
+               if self.virt_env.engine_vm() else []
+
         vdsm_dists = list(
             set([host.distro() for host in self.virt_env.host_vms()])
         )

@@ -107,12 +107,12 @@ def _vms_capable(vms, caps):
     return caps.issubset(existing_caps)
 
 
-def engine_capability(caps):
+def engine_capability(caps, idx=0):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             prefix = get_test_prefix()
-            if not _vms_capable([prefix.virt_env.engine_vm()], caps):
+            if not _vms_capable([prefix.virt_env.engine_vm()[idx]], caps):
                 raise SkipTest()
             return func()
 
