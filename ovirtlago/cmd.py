@@ -261,12 +261,19 @@ def do_ovirt_status(prefix, out_format, **kwargs):
 def do_ovirt_start(prefix, with_vms, vms_timeout, **kwargs):
     with LogTask('Starting oVirt environment'):
         prefix.start()
+        he = prefix.virt_env.engine_vm().is_hosted_engine()
+        if he:
+            with LogTask('Start HE VM'):
+                prefix.virt_env.engine_vm().start_he_vm()
         with LogTask('Waiting for ovirt-engine status'):
             prefix.virt_env.assert_engine_alive(timeout=3 * 60)
         with LogTask('Waiting for vdsmd status'):
             prefix.virt_env.assert_vdsm_alive(timeout=3 * 60)
         with LogTask('Updating Clusters CPU'):
             prefix.virt_env.update_clusters_cpu()
+        if he:
+            with LogTask('Moving out from global maintenance mode'):
+                prefix.virt_env.set_global_maintenance(False)
         with LogTask('Activating Engine Hosts'):
             prefix.virt_env.engine_vm().start_all_hosts(timeout=5 * 60)
         if with_vms:
@@ -302,11 +309,19 @@ def do_ovirt_start(prefix, with_vms, vms_timeout, **kwargs):
 @in_ovirt_prefix
 @with_logging
 def do_ovirt_stop(prefix, **kwargs):
+    he = prefix.virt_env.engine_vm().is_hosted_engine()
+
     with LogTask('Stopping oVirt environment'):
         with LogTask('Stopping Engine VMs'):
             prefix.virt_env.engine_vm().stop_all_vms()
+        if he:
+            with LogTask('Moving to global maintenance mode'):
+                prefix.virt_env.set_global_maintenance(True)
         with LogTask('Putting hosts in maintenance mode'):
             prefix.virt_env.engine_vm().stop_all_hosts()
+        if he:
+            with LogTask('Shutting down HE VM'):
+                prefix.virt_env.engine_vm().shutdown_he_vm()
         with LogTask('Shutdown Lago VMs'):
             prefix.shutdown()
 
